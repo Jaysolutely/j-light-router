@@ -6,6 +6,7 @@ export interface RouterOptions {
   fallback?: string;
   mappings?: [RegExp | string, string][];
   extended?: (RegExp | string)[];
+  disableHistory?: boolean;
 }
 
 interface RouterProperties {
@@ -21,12 +22,12 @@ interface RouterProperties {
   routeTree: ReturnType<typeof createRouteTree>;
 }
 
-
 export function createRouter({
   routes,
   fallback,
   mappings,
   extended,
+  disableHistory,
 }: RouterOptions = {}) {
   const props: RouterProperties = {
     routes: (routes || ["*"]).map(util.toRegExp),
@@ -94,6 +95,19 @@ export function createRouter({
     return props.route;
   }
 
+  function handlePopState(event: PopStateEvent) {
+    const levels = event.state?.levels;
+    if (!levels) return;
+    event.preventDefault();
+    setRoute(levels);
+  }
+
+  !disableHistory && window.addEventListener("popstate", handlePopState);
+
+  function destroy() {
+    !disableHistory && window.removeEventListener("popstate", handlePopState);
+  }
+
   const initialHref = new URL(window.location.toString()).pathname;
   const inititalLevels = interpretHref(initialHref);
   history.replaceState(
@@ -108,5 +122,6 @@ export function createRouter({
     push,
     on,
     getRoute,
+    destroy,
   };
 }
