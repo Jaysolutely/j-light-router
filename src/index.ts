@@ -66,7 +66,7 @@ export function createRouter({
     props.routeTree.save(usedLevels);
     props.route = usedLevels;
     props.subscriptions.routechange.forEach((fun) => fun(usedLevels));
-    return levels;
+    return usedLevels;
   }
   function push(href: string): void {
     const levels = interpretHref(href);
