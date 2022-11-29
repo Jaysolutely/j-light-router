@@ -76,7 +76,7 @@ export function createRouter({
     }
     const extend = props.extended.some((regExp) => regExp.test(href));
     const usedLevels = setRoute(levels, extend);
-    history.pushState({ levels: usedLevels }, "", `/${levels.join("/")}`);
+    history.pushState({ levels: usedLevels }, "", `/${usedLevels.join("/")}`);
   }
   function interceptHref(event: MouseEvent) {
     if (!event.currentTarget) return;
