@@ -61,11 +61,12 @@ export function createRouter({
     if (fallback) return fallback;
     return util.parseHref(href);
   }
-  function setRoute(levels: string[], extend = false) {
+  function setRoute(levels: string[], extend = false): string[] {
     const usedLevels = extend ? props.routeTree.extend(levels) : levels;
     props.routeTree.save(usedLevels);
     props.route = usedLevels;
     props.subscriptions.routechange.forEach((fun) => fun(usedLevels));
+    return levels;
   }
   function push(href: string): void {
     const levels = interpretHref(href);
@@ -73,9 +74,9 @@ export function createRouter({
       props.subscriptions.routesame.forEach((fun) => fun(levels));
       return;
     }
-    history.pushState({ levels }, "", `/${levels.join("/")}`);
     const extend = props.extended.some((regExp) => regExp.test(href));
-    setRoute(levels, extend);
+    const usedLevels = setRoute(levels, extend);
+    history.pushState({ levels: usedLevels }, "", `/${levels.join("/")}`);
   }
   function interceptHref(event: MouseEvent) {
     if (!event.currentTarget) return;
